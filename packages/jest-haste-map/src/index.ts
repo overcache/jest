@@ -232,6 +232,8 @@ export default class HasteMap extends EventEmitter {
     }
     const hasteMap = new HasteMap(options);
 
+    // FIXME: ensure generate same path for same ext
+    // const relativeFilePath = fastPath.relative(rootDir, filePath);
     await hasteMap.setupCachePath(options);
 
     return hasteMap;
@@ -241,7 +243,7 @@ export default class HasteMap extends EventEmitter {
     super();
     this._options = {
       cacheDirectory: options.cacheDirectory || tmpdir(),
-      computeDependencies:
+      computeDependencies: // FIXME: is necessary compute dep since we use babel later?
         options.computeDependencies === undefined
           ? true
           : options.computeDependencies,
@@ -261,14 +263,14 @@ export default class HasteMap extends EventEmitter {
       retainAllFiles: options.retainAllFiles,
       rootDir: options.rootDir,
       roots: Array.from(new Set(options.roots)),
-      skipPackageJson: !!options.skipPackageJson,
+      skipPackageJson: !!options.skipPackageJson, // FIXME: findout usege
       throwOnModuleCollision: !!options.throwOnModuleCollision,
-      useWatchman: options.useWatchman == null ? true : options.useWatchman,
-      watch: !!options.watch,
+      useWatchman: options.useWatchman == null ? true : options.useWatchman, // FIXME: measure impack
+      watch: !!options.watch, // // FIXME: measure impack
     };
     this._console = options.console || globalThis.console;
 
-    if (options.ignorePattern) {
+    if (options.ignorePattern) {// FIXME: can we ignore react-native/sdk paths?
       if (options.ignorePattern instanceof RegExp) {
         this._options.ignorePattern = new RegExp(
           options.ignorePattern.source.concat(`|${VCS_DIRECTORIES}`),
@@ -375,6 +377,7 @@ export default class HasteMap extends EventEmitter {
           hasteMap = data.hasteMap;
         }
 
+        // FIXME: rootDir vs roots?
         const rootDir = this._options.rootDir;
         const hasteFS = new HasteFS({
           files: hasteMap.files,
@@ -439,7 +442,7 @@ export default class HasteMap extends EventEmitter {
     } catch {
       hasteMap = this._createEmptyMap();
     }
-    return this._crawl(hasteMap);
+    return this._crawl(hasteMap); // FIXME: update hasteMap.files
   }
 
   /**
@@ -697,7 +700,7 @@ export default class HasteMap extends EventEmitter {
         this._options.rootDir,
         relativeFilePath,
       );
-      const promise = this._processFile(hasteMap, map, mocks, filePath);
+      const promise = this._processFile(hasteMap, map, mocks, filePath);// FIXME: change map, mocks inplace
       if (promise) {
         promises.push(promise);
       }

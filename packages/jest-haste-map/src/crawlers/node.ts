@@ -207,7 +207,7 @@ export async function nodeCrawl(options: CrawlerOptions): Promise<{
     roots,
   } = options;
 
-  const useNativeFind = await hasNativeFindSupport(forceNodeFilesystemAPI);
+  const useNativeFind = await hasNativeFindSupport(forceNodeFilesystemAPI);// FIXME: any performance improve by use rg?
 
   return new Promise(resolve => {
     const callback = (list: Result) => {
@@ -217,10 +217,11 @@ export async function nodeCrawl(options: CrawlerOptions): Promise<{
         const [filePath, mtime, size] = fileData;
         const relativeFilePath = fastPath.relative(rootDir, filePath);
         const existingFile = data.files.get(relativeFilePath);
-        if (existingFile && existingFile[H.MTIME] === mtime) {
+        if (existingFile && existingFile[H.MTIME] === mtime) { // FIXME: how to skip mtime check, so we can reuse sha-1/dep/
           files.set(relativeFilePath, existingFile);
         } else {
           // See ../constants.js; SHA-1 will always be null and fulfilled later.
+          // id: string, mtime: number, size: number, visited: 0 | 1, dependencies: string, sha1: string | null | undefined,
           files.set(relativeFilePath, ['', mtime, size, 0, '', null]);
         }
         removedFiles.delete(relativeFilePath);
